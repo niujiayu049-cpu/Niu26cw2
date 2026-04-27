@@ -176,9 +176,6 @@ import numpy as np
 import textwrap
 from matplotlib.colors import TwoSlopeNorm
 
-# -----------------------------
-# 1. 准备 heatmap 数据
-# -----------------------------
 
 df = combined.copy()
 
@@ -208,10 +205,8 @@ for year in year_columns:
         (pivot[year] - pivot[base_year]) / pivot[base_year] * 100
     ).round(1)
 
-# 只保留 2019-20 年入院人数大于 10000 的类别
 important = pivot[pivot[base_year] > 10000].copy()
 
-# 找 2020-21 年变化最大的前 20 个类别
 important["abs_lockdown_change"] = important["2020-21_change_pct"].abs()
 
 top_categories = important.sort_values(
@@ -229,16 +224,11 @@ print("Heatmap data saved as heatmap_ready_data.csv")
 print(heatmap_data)
 
 
-# -----------------------------
-# 2. 画 improved heatmap
-# -----------------------------
 
 change_columns = [f"{year}_change_pct" for year in year_columns]
 
 matrix = heatmap_data[change_columns].values
 
-# 颜色显示限制在 -100 到 +100
-# 但是格子里的数字仍然显示真实值，比如 +1748%
 matrix_for_colour = np.clip(matrix, -100, 100)
 
 labels = [
@@ -280,7 +270,6 @@ ax.set_title(
 ax.set_xlabel("Financial Year")
 ax.set_ylabel("Primary Diagnosis Summary Category")
 
-# 每个格子显示真实百分比
 for i in range(matrix.shape[0]):
     for j in range(matrix.shape[1]):
         value = matrix[i, j]
@@ -296,13 +285,11 @@ for i in range(matrix.shape[0]):
                 color="black"
             )
 
-# 加白色网格线
 ax.set_xticks(np.arange(matrix.shape[1] + 1) - 0.5, minor=True)
 ax.set_yticks(np.arange(matrix.shape[0] + 1) - 0.5, minor=True)
 ax.grid(which="minor", color="white", linestyle="-", linewidth=0.7)
 ax.tick_params(which="minor", bottom=False, left=False)
 
-# 图下面说明
 fig.text(
     0.5,
     0.01,
